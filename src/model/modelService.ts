@@ -13,6 +13,8 @@ import { MarkerService } from '../source/markers';
 import { DataProvider } from '../tree/dataProvider';
 import { Grouping } from '../tree/configurationNode';
 import { KaiFixDetails } from '../kaiFix/kaiFix';
+import { rhamtChannel } from '../util/console';
+import { LocalProviderRunner } from '../server/providerUtil';
 
 export class ModelService {
 
@@ -82,6 +84,7 @@ export class ModelService {
         config.options['mode'] = 'source-only';
         config.options['overwrite'] = true;
         config.options['enable-default-rulesets'] = true;
+        config.options['provider'] = 'java';
 
         return config;
     }
@@ -336,6 +339,10 @@ export class ModelService {
             console.log(`Error while saving configuration data: ${e}`);
             return Promise.reject(`Error saving configuration data: ${e}`);
         }
+    }
+
+    public async stopProviders() {
+        LocalProviderRunner.getInstance().stop(rhamtChannel);
     }
 
     saveAnalysisResults(config: RhamtConfiguration): Promise<void> {
