@@ -32,7 +32,7 @@ export class KaiFixDetails {
     private outputChannel: vscode.OutputChannel;
     private _fileNodes: Map<string, FileNode> = new Map();
 
-    constructor(context: ExtensionContext, modelService: ModelService, fileNodeMap ?:  Map<string, FileNode> ) {
+    constructor(context: ExtensionContext, private modelService: ModelService, fileNodeMap ?:  Map<string, FileNode> ) {
         this.context = context;
         this.outputChannel = window.createOutputChannel("KaiFix Output");
         this.taskProvider = new MyTaskProvider(this.outputChannel, this);
@@ -49,34 +49,39 @@ export class KaiFixDetails {
             }
             vscode.window.showInformationMessage(`fileNodes map size =  ${this._fileNodes.size}`);
             const fileNode = this._fileNodes.get(uri.fsPath); 
-            const fileMap = this.globalRequestsManager.getFileMap();
+            //const fileMap = this.globalRequestsManager.getFileMap();
             this.modelService.dataProvider.refreshNode(fileNode);
-            if (fileMap.get(uri.fsPath) === undefined) {
-                vscode.window.showInformationMessage(`No entry exists in Map, so adding...+ ${fileNode.file}`);
-               // this.modelService.reload();
-                //Run analyzer-lsp 
-                //const config = fileNode.config; 
-               // window.showInformationMessage(`config : ${config.name}`);
-                vscode.commands.executeCommand('rhamt.rerun', fileNode).then(() => {
-                    this.globalRequestsManager.handleRequest(uri.fsPath, "Kantra");
-                });
-                //And add this request to the global map
-
-            } else {
-                vscode.window.showInformationMessage(`Process is already running, cancelling in-progress activity and rerunning analyzer. Global Manager size: ${this.globalRequestsManager.getFileMap().size}`);
-                if (fileNode) {
-                    vscode.commands.executeCommand('rhamt.Stop', fileNode).then(() => {
-                        vscode.window.showInformationMessage(`After removing, size should be: ${this.globalRequestsManager.getFileMap().size}`);
-                        fileNode.setInProgress(true, "analyzing");
-                        this.globalRequestsManager.handleRequest(uri.fsPath, "Kantra");
-                    });
+                const request: Requests = {
+                    id: incrementTaskCounter(),
+                    name: undefined,
+                    type: 'kantra',
+                    file: fileNode.file,
+                    data: fileNode as FileNode
+                }; 
+                if (this.fileStateMap.get(fileNode.file)?.inProgress) {
+                    window.showInformationMessage(`Process already running for file: ${fileNode.file}, Cancelling current process and reanalyzing current changes!`);
+                    if (fileNode) {
+                                vscode.commands.executeCommand('rhamt.Stop', fileNode).then(() => {
+                                    addRequest(request);
+                                    this.taskProvider.processQueue();
+                                });  
+                        }
+                } else {
+                    vscode.window.showInformationMessage(`No entry exists in Map, so adding...+ ${fileNode.file}`);
+                    // this.modelService.reload();
+                     //const config = fileNode.config; 
+                    // window.showInformationMessage(`config : ${config.name}`);
+                    addRequest(request);
+                    this.taskProvider.processQueue();
+                    
                 }
-            }
+    
         });
         context.subscriptions.push(watcher);
 
         context.subscriptions.push(commands.registerCommand('rhamt.Stop', async item => {
             const fileNode = item as FileNode;
+            this.taskProvider.stopTask(fileNode.file);
             this.stopFileProcess(fileNode.file);
         }));
 
