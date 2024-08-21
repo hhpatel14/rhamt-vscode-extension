@@ -9,12 +9,15 @@ import * as fse from 'fs-extra';
 import * as mkdirp from 'mkdirp';
 import * as vscode from 'vscode';
 import { AnalyzerUtil } from '../server/analyzerUtil';
+import { rhamtChannel } from '../util/console';
+import { LocalProviderRunner } from '../server/providerUtil';
 import { MarkerService } from '../source/markers';
 import { DataProvider } from '../tree/dataProvider';
 import { Grouping } from '../tree/configurationNode';
 import { KaiFixDetails } from '../kaiFix/kaiFix';
 import { rhamtChannel } from '../util/console';
 import { LocalProviderRunner } from '../server/providerUtil';
+
 
 export class ModelService {
 

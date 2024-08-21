@@ -32,6 +32,12 @@ export function getRequests() {
 }
 
 export function addRequest(request: Requests) {
+    // Check if there a process running on the file
+    if (fileProcessMap.get(request.file)?.inProgress) {
+        console.log(`A process is running on the file ${request.file}`);
+        vscode.window.showErrorMessage(`A process is running on the file ${request.file}`);
+        return;
+    }
     requests.push(request);
     console.log(`Task added to queue: ${JSON.stringify(request)}`);
 }
@@ -247,7 +253,7 @@ class SimplePseudoterminal implements vscode.Pseudoterminal {
                 return { error: `HTTP error! status: ${response.status}` };
             }
 
-            const responseText = await response.text();
+            const responseText = await response.json();
             this.outputChannel.appendLine(`Kai backend processed for task ${this.request.name}`);
             return { result: responseText };
         } catch (error) {
