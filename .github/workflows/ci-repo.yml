@@ -3,11 +3,11 @@ name: Basic CI
 on:
   push:
     branches:
-      - "7.2.0" # Trigger only on pushes to the master branch
+      - "*" # Trigger only on pushes to the master branch
 
   pull_request:
     branches:
-      - "7.2.0" # Trigger on pull requests targeting the master branch
+      - "*" # Trigger on pull requests targeting the master branch
 
 jobs:
   test:
