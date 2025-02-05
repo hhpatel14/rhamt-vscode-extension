@@ -67,11 +67,9 @@ jobs:
           name: vscode-extension
           path: dist/*.vsix
 
-      - name: Fake Publish (If Fork) or Real Publish
+      - name: Publish to marketplace
         run: |
-          if [ "${{ github.repository_owner }}" = "hhpatel14" ]; then
-            echo "This is a fork. Running fake publish..."
-          else
-            echo "This is the main repo. Publishing to VS Code Marketplace..."
-            vsce publish --pat ${{ secrets.VSCE_TOKEN }}
+          if [ "${{ github.repository_owner }}" = "migtool" ]; then
+            echo "Publishing to VS Code Marketplace..."
+            vsce publish --pat ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
           fi
