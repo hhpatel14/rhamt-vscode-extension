@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - "master" # Trigger only on pushes to the master branch
-
   pull_request:
     branches:
       - "master" # Trigger on pull requests targeting the master branch
+  release:
+    types:
+      - created # Run when a new release is created
 
 jobs:
   test:
@@ -31,4 +33,41 @@ jobs:
 
       # Step 4: Compile the project
       - name: Compile the project
-        run: npm run compile
+        run: npm run compile 
+
+  publish:
+    name: Fake Publish in Fork (Real in Main)
+    runs-on: ubuntu-latest
+    needs: test  # Ensure tests pass before publishing
+    if: github.event_name == 'release'  # Ensure it only runs on a new release
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "16"
+
+      - name: Install vsce (VS Code Extension Manager)
+        run: npm install -g @vscode/vsce
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Extension
+        run: npm run compile  # Change if needed
+
+      # Step 5: Fake Publish on Fork, Real Publish on Main
+      - name: Fake Publish (If Fork) or Real Publish
+        env:
+          IS_FORK: ${{ github.repository_owner != 'hhpatel14' }}
+        run: |
+          if [ "$IS_FORK" = "true" ]; then
+            echo "This is a fork. Running fake publish..."
+            vsce package
+          else
+            echo "This is the main repo. Publishing to VS Code Marketplace..."
+            vsce publish --pat ${{ secrets.VSCE_TOKEN }}
+          fi
