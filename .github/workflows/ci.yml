@@ -62,12 +62,12 @@ jobs:
       # Step 5: Fake Publish on Fork, Real Publish on Main
       - name: Fake Publish (If Fork) or Real Publish
         env:
-          IS_FORK: ${{ github.repository_owner != 'hhpatel14' }}
+          IS_FORK: ${{ github.repository_owner == 'hhpatel14' }}
         run: |
+          echo "This is a fork. Running fake publish..."
           if [ "$IS_FORK" = "true" ]; then
             echo "This is a fork. Running fake publish..."
             vsce package
           else
             echo "This is the main repo. Publishing to VS Code Marketplace..."
-            vsce publish --pat ${{ secrets.VSCE_TOKEN }}
           fi
