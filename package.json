@@ -1,8 +1,8 @@
 {
     "name": "test-mta-1",
-    "displayName": "Migration Toolkit for Applications (MTA)",
-    "description": "Migration Toolkit for Applications (MTA)",
-    "version": "7.3.0",
+    "displayName": "test-mta-1",
+    "description": "test-mta-1",
+    "version": "0.0.1",
     "license": "epl-2.0",
     "publisher": "test-hitp",
     "author": "throwaway",
