@@ -7,4 +7,3 @@ out/
 build/
 dist/
 *.vsix
-CHANGELOG.md
