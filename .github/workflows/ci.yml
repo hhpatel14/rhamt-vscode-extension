@@ -3,10 +3,10 @@ name: CI (compile, build and publish)
 on:
   push:
     branches:
-      - "master"
+      - "test"
   pull_request:
     branches:
-      - "master"
+      - "test"
   release:
     types:
       - created
@@ -67,11 +67,23 @@ jobs:
           name: vscode-extension
           path: dist/*.vsix
 
+      - name: Create fake changelog file
+        run: |
+          echo "## Fake Changelog for CI Test" > .fake-changelog.md
+          echo "" >> .fake-changelog.md
+          echo "- Test entry 1" >> .fake-changelog.md
+          echo "- Test entry 2" >> .fake-changelog.md
+      
+
+
       - name: Publish to marketplace
         run: |
-          if [ "${{ github.repository_owner }}" = "migtools" ]; then
+          if [ "${{ github.repository_owner }}" = "hhpatel14" ]; then
             echo "Publishing to VS Code Marketplace..."
-            vsce publish --pat ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
+            echo "version of vsce: $(vsce --version)"
+            npx @vscode/vsce publish \
+              --pat ${{ secrets.VSCODE_MARKETPLACE_TOKEN }} \
+              --changelog-path .fake-changelog.md
           fi
 
   pre-publish:
