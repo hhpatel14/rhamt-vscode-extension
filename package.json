@@ -1,5 +1,5 @@
 {
-    "name": "mta-vscode-extension",
+    "name": "test-mta-1",
     "displayName": "Migration Toolkit for Applications (MTA)",
     "description": "Migration Toolkit for Applications (MTA)",
     "version": "7.3.0",
@@ -275,6 +275,7 @@
         "@types/sinon-chai": "^3.2.2",
         "@types/socket.io": "^1.4.36",
         "@types/socket.io-client": "^1.4.32",
+        "@vscode/vsce": "^3.7.1",
         "chai": "^4.2.0",
         "sinon": "^7.2.7",
         "sinon-chai": "^3.3.0",
